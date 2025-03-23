@@ -1,4 +1,6 @@
 import enum
+from random import shuffle
+
 from encodings.punycode import selective_find
 
 
@@ -111,44 +113,49 @@ class Card:
 
 class Deck:
     def __init__(self):
-        self._cards = []
-        self._index = iter
+        self._cards = [(rank.name,suit.name) for rank in CardRank for suit in CardSuit]
+        self._index = 0
+        self.suit = CardSuit
+        self.rank = CardRank
+
+    def __len__(self):
+        return  len(self._cards)
+
+    def __getitem__(self, index):
+        return self._cards[index]
+
+    def __iter__(self):
+        self._index = 0
+        return self
+
+    def __next__(self):
+        if self._index < len(self._cards):
+            card = self._cards[self._index]
+            self._index +=1
+            return card
+        else:
+            raise StopIteration
 
 
-TWO = CardRank(CardRank.TWO)
-THREE = CardRank(CardRank.THREE)
+    @property
+    def cards(self):
+        return self._cards
 
-#
+    def shuffle(self):
+        shuffle(self._cards)
+        return self._cards
 
-# print(four.face_up)
-# four.flip()
-# print(four.face_up)
-# four.flip()
-# print(four.face_up)
-# print(four.suit)
-# print(four.rank)
-# print(four.get_display_name())
-#
-#
-# def __eq__(self, other):
-#     if isinstance(other, Card):
-#         return self._rank == other._rank and self._suit == other._suit
-#
-# def __lt__(self, other):
-#     if isinstance(other, Card):
-#         if not self._rank == other._rank:
-#             return self._rank < other._rank
-#         else:
-#             return self._suit < other._suit
+    def draw(self):
+        self._cards.remove(self._cards[0])
+        return self._cards[0]
 
-four = Card(CardSuit.CLUBS, CardRank.FIVE)
-fourr = Card(CardSuit.DIAMONDS,CardRank.FIVE)
+    def add_Card(self,card):
+        self._cards.append(card)
 
-print(four.suit)
-print(fourr.suit)
-print(four<fourr)
-print(hash(four))
-print(four)
-four.flip()
-print(four)
-print(repr(four))
+
+
+deck  = Deck()
+print(deck.cards)
+print(deck.draw())
+print(deck.cards)
+print(deck.shuffle())
